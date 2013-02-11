@@ -7,7 +7,7 @@
     <packaging>jar</packaging>
 
     <name>jVistA</name>
-    <url>http://maven.apache.org</url>
+    <url>https://wiki.iehr.us</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -83,6 +83,12 @@
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
             <version>3.1</version>
+            <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>commons-configuration</groupId>
+            <artifactId>commons-configuration</artifactId>
+            <version>1.6</version>
             <type>jar</type>
         </dependency>
     </dependencies>

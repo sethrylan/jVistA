@@ -13,5 +13,5 @@ Rpcs/DDR LISTER".
 
 ### Build Instructions
 ```
-maven verify
+mvn verify
 ```
