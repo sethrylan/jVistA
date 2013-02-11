@@ -1,4 +1,4 @@
-package test.com.vistacowboy.jVista;
+package com.vistacowboy.jVista;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -25,6 +25,7 @@ public class VistaConnectionTest extends TestCase
     {
         super.setUp();
         cxn = new VistaConnection("74.67.137.153", 19200);
+
     }
 
     public void tearDown() throws Exception

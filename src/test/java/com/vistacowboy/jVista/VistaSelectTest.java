@@ -1,4 +1,4 @@
-package test.com.vistacowboy.jVista;
+package com.vistacowboy.jVista;
 
 import org.junit.After;
 import org.junit.Assert;

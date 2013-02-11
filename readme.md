@@ -1,4 +1,6 @@
-jVista, version 1.0 beta, is a Java version of the MDO version of the
+### jVistA
+
+jVistA is a Java version of the MDO version of the
 Delphi RPC Broker. It offers basic RPC connectivity to a single VistA
 system. Unlike MDO, it has no multi-site functionality, nor can it
 visit Vista systems. There must be a logged in user. It can connect,
@@ -8,3 +10,6 @@ be able to make any RPC. See tests for how it works.
 To begin to delve into the mysteries of VistaSelect see the
 documentation at http://vistacowboy.com. Pick "School House/
 Rpcs/DDR LISTER".
+
+## Build Instructions
+maven verify

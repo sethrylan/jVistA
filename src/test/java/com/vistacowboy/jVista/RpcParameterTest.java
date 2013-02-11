@@ -1,4 +1,4 @@
-package test.com.vistacowboy.jVista;
+package com.vistacowboy.jVista;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
