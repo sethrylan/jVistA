@@ -4,6 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import com.vistacowboy.jVista.VistaConnection;
+import org.junit.Ignore;
 
 /** 
 * VistaConnection Tester. 
@@ -12,6 +13,7 @@ import com.vistacowboy.jVista.VistaConnection;
 * @since <pre>11/26/2012</pre> 
 * @version 1.0 
 */ 
+@Ignore
 public class VistaConnectionTest extends TestCase
 {
     VistaConnection cxn = null;

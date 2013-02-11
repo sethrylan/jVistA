@@ -11,6 +11,7 @@ import com.vistacowboy.jVista.VistaUser;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import org.junit.Ignore;
 
 /** 
 * VistaSelect Tester.
@@ -242,6 +243,7 @@ public class VistaSelectTest {
      *
      */
     @Test
+    @Ignore
     public void testFindFms() throws Exception {
         query.setFile("410");
         query.setFields(".01;1;24;23;22");
