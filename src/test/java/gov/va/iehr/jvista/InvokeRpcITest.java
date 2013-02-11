@@ -89,34 +89,14 @@ public class InvokeRpcITest {
      * M source to NHINV: http://wbvista.info/VDOCS/RoutinesPlus/RFRAME.php?ROUTINE=NHINVTIU
      * NHIN GET VISTA DATA: http://livevista.caregraf.info/rambler#!8994-3140
      * VDL Documentation: http://www.va.gov/vdl/documents/Clinical/nationwide_health_info_net/nhin_tm.pdf
-     * List of clinical domains for NHINV: 
-     * ACCESSION
-     * ALLERGY
-     * APPOINTMENT
-     * CONSULT
-     * DOCUMENT
-     * IMMUNIZATION
-     * LAB
-     * PANEL
-     * MED
-     * RX
-     * ORDER
-     * PATIENT
-     * PROBLEM
-     * PROCEDURE
-     * SURGERY
-     * VISIT
-     * VITAL
-     * RADIOLOGY
-     * NEW
      */
     @Test
-    public void nhinRpcTest() {
+    public void nhinVitalRpcTest() {
         RpcParameter dfn, id;
         try {
             // Routine parameters are GET(NHIN,DFN,TYPE,START,STOP,MAX,ID)
             dfn = new RpcParameter(RpcParameter.LITERAL, "2");
-            id = new RpcParameter(RpcParameter.LITERAL, "vital");
+            id = new RpcParameter(RpcParameter.LITERAL, NhinDomain.VITAL.getId());
             String preparedRpc = VistaRpc.prepare("NHIN GET VISTA DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
             assertTrue("XML result\n\n: " + result + "\n\n...could not be parsed.", XMLValidation.isXMLWellFormed(result));            
@@ -138,6 +118,41 @@ public class InvokeRpcITest {
             logger.error(null, ex);
         }
     }
+    
+    
+    @Test
+    public void nhinRpcTest() {
+        RpcParameter dfn, id;
+        try {
+            dfn = new RpcParameter(RpcParameter.LITERAL, "2");
+            NhinDomain[] domainList = {NhinDomain.ACCESSION, NhinDomain.ALLERGY, NhinDomain.APPOINTMENT, 
+                                        NhinDomain.CONSULT, NhinDomain.IMMUNIZATION, NhinDomain.LAB, 
+                                        NhinDomain.MED, NhinDomain.ORDER,NhinDomain.PANEL, NhinDomain.PATIENT, 
+                                        NhinDomain.PROBLEM, NhinDomain.PROCEDURE, NhinDomain.RADIOOLOGY, 
+                                        NhinDomain.RX, NhinDomain.SURGERY, NhinDomain.VISIT, NhinDomain.VITAL};
+            for(NhinDomain nhinDomain : domainList) {
+                id = new RpcParameter(RpcParameter.LITERAL, nhinDomain.getId());
+                String preparedRpc = VistaRpc.prepare("NHIN GET VISTA DATA", new RpcParameter[]{dfn,id});
+                String result = connection.exec(preparedRpc);
+                assertTrue("XML result for dfn=" + dfn.getValue() + "; domain=" + nhinDomain.getId() + " could not be parsed: " + result + ".", XMLValidation.isXMLWellFormed(result));            
+                Document document = null;
+                try {
+                    document = stringToDom(result);
+                } catch (SAXException ex) {
+                    logger.error(null, ex);
+                } catch (ParserConfigurationException ex) {
+                    logger.error(null, ex);
+                } catch (IOException ex) {
+                    logger.error(null, ex);
+                }
+                NodeList resultsNodes = document.getElementsByTagName("results");
+                assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
+            }
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+    }
+
     
     
     /**
