@@ -11,7 +11,7 @@ To begin to delve into the mysteries of VistaSelect see the
 documentation at http://vistacowboy.com. Pick "School House/
 Rpcs/DDR LISTER".
 
-## Build Instructions
+### Build Instructions
 ```
 maven verify
 ```
