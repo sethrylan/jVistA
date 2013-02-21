@@ -1,5 +1,7 @@
 package gov.va.iehr.jvista;
 
+import com.sun.org.apache.xml.internal.serialize.OutputFormat;
+import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import com.vistacowboy.jVista.RpcParameter;
 import com.vistacowboy.jVista.VistaConnection;
 import com.vistacowboy.jVista.VistaException;
@@ -9,10 +11,13 @@ import com.vistacowboy.jVista.VistaUser;
 import gov.va.common.VistAResource;
 import gov.va.common.xml.XMLValidation;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.StringReader;
+import java.util.logging.Level;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.TransformerException;
 import static junit.framework.Assert.*;
 import org.junit.*;
 import org.slf4j.Logger;
@@ -99,6 +104,7 @@ public class InvokeRpcITest {
             id = new RpcParameter(RpcParameter.LITERAL, NhinDomain.VITAL.getId());
             String preparedRpc = VistaRpc.prepare("NHIN GET VISTA DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
+//            System.out.println(result);
             assertTrue("XML result\n\n: " + result + "\n\n...could not be parsed.", XMLValidation.isXMLWellFormed(result));            
             Document document = null;
             try {
@@ -109,6 +115,13 @@ public class InvokeRpcITest {
                 logger.error(null, ex);
             } catch (IOException ex) {
                 logger.error(null, ex);
+            }
+            try {
+                prettyPrintDocument(document, System.out);
+            } catch (IOException ex) {
+                java.util.logging.Logger.getLogger(InvokeRpcITest.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (TransformerException ex) {
+                java.util.logging.Logger.getLogger(InvokeRpcITest.class.getName()).log(Level.SEVERE, null, ex);
             }
             NodeList resultsNodes = document.getElementsByTagName("results");
             assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
@@ -196,4 +209,12 @@ public class InvokeRpcITest {
         DocumentBuilder builder = docFactory.newDocumentBuilder();
         return builder.parse(new InputSource(new StringReader(xmlSource)));
     }
+    
+    public static void prettyPrintDocument(Document doc, OutputStream out) throws IOException, TransformerException {        
+        OutputFormat format = new OutputFormat(doc);
+        format.setIndenting(true);
+        XMLSerializer serializer = new XMLSerializer(out, format);
+        serializer.serialize(doc);
+    }
+
 }
