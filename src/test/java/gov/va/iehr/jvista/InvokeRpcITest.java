@@ -1,7 +1,5 @@
 package gov.va.iehr.jvista;
 
-import com.sun.org.apache.xml.internal.serialize.OutputFormat;
-import com.sun.org.apache.xml.internal.serialize.XMLSerializer;
 import com.vistacowboy.jVista.RpcParameter;
 import com.vistacowboy.jVista.VistaConnection;
 import com.vistacowboy.jVista.VistaException;
@@ -11,20 +9,23 @@ import com.vistacowboy.jVista.VistaUser;
 import gov.va.common.VistAResource;
 import gov.va.common.xml.XMLValidation;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.StringReader;
-import java.util.logging.Level;
+import java.io.StringWriter;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerException;
 import static junit.framework.Assert.*;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.DOMConfiguration;
+import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSOutput;
+import org.w3c.dom.ls.LSSerializer;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
@@ -96,11 +97,11 @@ public class InvokeRpcITest {
      * VDL Documentation: http://www.va.gov/vdl/documents/Clinical/nationwide_health_info_net/nhin_tm.pdf
      */
     @Test
-    public void nhinVitalRpcTest() {
+    public void nhinVitalRpcTest() throws ClassNotFoundException {
         RpcParameter dfn, id;
         try {
             // Routine parameters are GET(NHIN,DFN,TYPE,START,STOP,MAX,ID)
-            dfn = new RpcParameter(RpcParameter.LITERAL, "2");
+            dfn = new RpcParameter(RpcParameter.LITERAL, "1");
             id = new RpcParameter(RpcParameter.LITERAL, NhinDomain.VITAL.getId());
             String preparedRpc = VistaRpc.prepare("NHIN GET VISTA DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
@@ -116,13 +117,8 @@ public class InvokeRpcITest {
             } catch (IOException ex) {
                 logger.error(null, ex);
             }
-            try {
-                prettyPrintDocument(document, System.out);
-            } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(InvokeRpcITest.class.getName()).log(Level.SEVERE, null, ex);
-            } catch (TransformerException ex) {
-                java.util.logging.Logger.getLogger(InvokeRpcITest.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            
+            System.out.println(getPrettyPrintDocument(document));
             NodeList resultsNodes = document.getElementsByTagName("results");
             assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
             Node resultNode = resultsNodes.item(0);
@@ -209,12 +205,28 @@ public class InvokeRpcITest {
         DocumentBuilder builder = docFactory.newDocumentBuilder();
         return builder.parse(new InputSource(new StringReader(xmlSource)));
     }
-    
-    public static void prettyPrintDocument(Document doc, OutputStream out) throws IOException, TransformerException {        
-        OutputFormat format = new OutputFormat(doc);
-        format.setIndenting(true);
-        XMLSerializer serializer = new XMLSerializer(out, format);
-        serializer.serialize(doc);
+
+    public static String getPrettyPrintDocument(Document doc) {
+        // see http://www.chipkillmar.net/2009/03/25/pretty-print-xml-from-a-dom/
+        DOMImplementation domImplementation = doc.getImplementation();
+        if (domImplementation.hasFeature("LS", "3.0") && domImplementation.hasFeature("Core", "2.0")) {
+            DOMImplementationLS domImplementationLS = (DOMImplementationLS) domImplementation.getFeature("LS", "3.0");
+            LSSerializer lsSerializer = domImplementationLS.createLSSerializer();
+            DOMConfiguration domConfiguration = lsSerializer.getDomConfig();
+            if (domConfiguration.canSetParameter("format-pretty-print", Boolean.TRUE)) {
+                lsSerializer.getDomConfig().setParameter("format-pretty-print", Boolean.TRUE);
+                LSOutput lsOutput = domImplementationLS.createLSOutput();
+                lsOutput.setEncoding("UTF-8");
+                StringWriter stringWriter = new StringWriter();
+                lsOutput.setCharacterStream(stringWriter);
+                lsSerializer.write(doc, lsOutput);
+                return stringWriter.toString();
+            } else {
+                throw new RuntimeException("DOMConfiguration 'format-pretty-print' parameter isn't settable.");
+            }
+        } else {
+            throw new RuntimeException("DOM 3.0 LS and/or DOM 2.0 Core not supported.");
+        }
     }
 
 }
