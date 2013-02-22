@@ -1,9 +1,9 @@
 package gov.va.iehr.jvista;
 
-import gov.va.common.VistAResource;
 import com.vistacowboy.jVista.VistaConnection;
 import com.vistacowboy.jVista.VistaException;
 import com.vistacowboy.jVista.VistaUser;
+import gov.va.common.VistAResource;
 import static junit.framework.Assert.*;
 import org.junit.After;
 import org.junit.AfterClass;

@@ -18,41 +18,26 @@ dependencies {
     testCompile 'junit:junit:4.10'
 }
 
-//http://www.gradle.org/docs/current/dsl/org.gradle.api.tasks.testing.Test.html
-test {
-    // show standard out and standard error of the test JVM(s) on the console
+tasks.withType(Test) {
     testLogging.showStandardStreams = true
     
-    minHeapSize = "128m"
-    maxHeapSize = "512m"
-    jvmArgs '-XX:MaxPermSize=256m'
-
     // listen to events in the test execution lifecycle
     beforeTest { descriptor ->
         logger.lifecycle("\t" + descriptor)
     }
-
     // listen to standard out and standard error of the test JVM(s)
 //    onOutput { descriptor, event ->
 //        logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
 //    }
+
 }
 
-sourceSets {
-    integrationTest {
-        compileClasspath = sourceSets.main.output + configurations.testRuntime
-        runtimeClasspath = output + sourceSets.main.output + configurations.testRuntime
-        java {
-            srcDir 'src/main/java'
-        }
-    }
+//http://www.gradle.org/docs/current/dsl/org.gradle.api.tasks.testing.Test.html
+test {    
+    minHeapSize = "128m"
+    maxHeapSize = "512m"
+    jvmArgs '-XX:MaxPermSize=256m'
 }
-
-task integrationTest(type: Test) {
-    testClassesDir = sourceSets.integrationTest.output.classesDir
-    classpath = sourceSets.integrationTest.runtimeClasspath
-}
-
 
 
 task listCache << {
