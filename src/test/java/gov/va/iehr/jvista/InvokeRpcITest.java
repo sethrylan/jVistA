@@ -78,14 +78,15 @@ public class InvokeRpcITest {
     public void selectTest() {
         VistaSelect select = new VistaSelect();
         select.setFile("2");
+        select.setFields(".01");
         String[][] result = null;
         try {
             result = select.find(connection);
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
+        //printMatrix(result);
         assertTrue("There should be over 100 patients.", result.length > 100);
-//        printMatrix(result);
     }
 
     /**
@@ -97,12 +98,12 @@ public class InvokeRpcITest {
      * VDL Documentation: http://www.va.gov/vdl/documents/Clinical/nationwide_health_info_net/nhin_tm.pdf
      */
     @Test
-    public void nhinVitalRpcTest() throws ClassNotFoundException {
+    public void nhinVitalRpcTest()  {
         RpcParameter dfn, id;
         try {
             // Routine parameters are GET(NHIN,DFN,TYPE,START,STOP,MAX,ID)
-            dfn = new RpcParameter(RpcParameter.LITERAL, "1");
-            id = new RpcParameter(RpcParameter.LITERAL, NhinDomain.VITAL.getId());
+            dfn = new RpcParameter(RpcParameter.LITERAL, "2");
+            id = new RpcParameter(RpcParameter.LITERAL, NhinDomain.PATIENT.getId());
             String preparedRpc = VistaRpc.prepare("NHIN GET VISTA DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
 //            System.out.println(result);
@@ -118,7 +119,7 @@ public class InvokeRpcITest {
                 logger.error(null, ex);
             }
             
-            System.out.println(getPrettyPrintDocument(document));
+//            System.out.println(getPrettyPrintDocument(document));
             NodeList resultsNodes = document.getElementsByTagName("results");
             assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
             Node resultNode = resultsNodes.item(0);

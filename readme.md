@@ -13,5 +13,5 @@ Rpcs/DDR LISTER".
 
 ### Build Instructions
 ```
-mvn verify
+gradle build
 ```

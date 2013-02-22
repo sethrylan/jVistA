@@ -1,0 +1,64 @@
+apply plugin: 'java'
+
+group = 'gov.va.iehr'
+version = '0.1'
+
+sourceCompatibility = '1.7'
+[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile 'org.slf4j:slf4j-api:1.7.1',
+            'org.slf4j:slf4j-simple:1.7.1',
+            'commons-configuration:commons-configuration:1.6',
+            'org.apache.commons:commons-lang3:3.1'
+    testCompile 'junit:junit:4.10'
+}
+
+//http://www.gradle.org/docs/current/dsl/org.gradle.api.tasks.testing.Test.html
+test {
+    // show standard out and standard error of the test JVM(s) on the console
+    testLogging.showStandardStreams = true
+    
+    minHeapSize = "128m"
+    maxHeapSize = "512m"
+    jvmArgs '-XX:MaxPermSize=256m'
+
+    // listen to events in the test execution lifecycle
+    beforeTest { descriptor ->
+        logger.lifecycle("\t" + descriptor)
+    }
+
+    // listen to standard out and standard error of the test JVM(s)
+//    onOutput { descriptor, event ->
+//        logger.lifecycle("Test: " + descriptor + " produced standard out/err: " + event.message )
+//    }
+}
+
+sourceSets {
+    integrationTest {
+        compileClasspath = sourceSets.main.output + configurations.testRuntime
+        runtimeClasspath = output + sourceSets.main.output + configurations.testRuntime
+        java {
+            srcDir 'src/main/java'
+        }
+    }
+}
+
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+}
+
+
+
+task listCache << {
+    configurations.compile.each { println it } 
+}
+
+task listJars << {
+    configurations.compile.each { File file -> println file.name }
+}
