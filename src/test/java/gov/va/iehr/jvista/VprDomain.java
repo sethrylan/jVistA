@@ -34,7 +34,7 @@ public enum VprDomain {
     SURGERY("surg"),
     VISIT("visit"),
     VITAL("vital"),
-    RADIOOLOGY("rad"),      // also "xray"
+    RADIOLOGY("rad"),      // also "xray"
     NEW("new");    
 
     private String id;

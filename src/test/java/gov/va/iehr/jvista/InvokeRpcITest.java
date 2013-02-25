@@ -91,18 +91,16 @@ public class InvokeRpcITest {
         RpcParameter dfn, id;
         try {
             dfn = new RpcParameter(RpcParameter.LITERAL, "2");
-            id = new RpcParameter(RpcParameter.LITERAL, NhinDomain.PATIENT.getId());
+            id = new RpcParameter(RpcParameter.LITERAL, NhinDomain.VITAL.getId());
             String preparedRpc = VistaRpc.prepare("NHIN GET VISTA DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
-//            System.out.println(result);
-            assertTrue("XML result\n\n: " + result + "\n\n...could not be parsed.", XMLValidation.isXMLWellFormed(result));            
             Document document = null;
             try {
                 document = TestUtils.getDom(result);
             } catch (SAXException ex) {
                 fail("XML could not be parsed:" + result);
             }
-//            System.out.println(getPrettyPrintDocument(document));
+            //System.out.println(TestUtils.getPrettyPrintDocument(document));
             NodeList resultsNodes = document.getElementsByTagName("results");
             assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
             Node resultNode = resultsNodes.item(0);
@@ -113,7 +111,7 @@ public class InvokeRpcITest {
     }
     
     
-    
+   
     @Test
     @Ignore
     public void printNhinDomains() {
@@ -133,13 +131,13 @@ public class InvokeRpcITest {
                 id = new RpcParameter(RpcParameter.LITERAL, domain.getId());
                 String preparedRpc = VistaRpc.prepare("NHIN GET VISTA DATA", new RpcParameter[]{dfn,id});
                 String result = connection.exec(preparedRpc);
-                System.out.println(result.length());
-                System.out.println(result.substring(0, Math.min(60, result.length())));
                 try {
-                    TestUtils.getDom(result);
+                    Document document = TestUtils.getDom(result);
+                    result = TestUtils.getPrettyPrintDocument(document);
                 } catch (SAXException ex) {
                     System.out.println("XML could not be parsed:" + result);
                 }
+                System.out.println(result.substring(0, Math.min(1500, result.length())));
             } catch (VistaException ex) {
                 logger.error(null, ex);
             }

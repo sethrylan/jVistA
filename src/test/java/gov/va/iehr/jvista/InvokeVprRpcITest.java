@@ -44,7 +44,7 @@ public class InvokeVprRpcITest {
         VistaUser user = new VistaUser();
         String access_code = VistAResource.getAccessCode();
         String verify_code = VistAResource.getVerifyCode();
-        String context = "VPR APPLICATION PROXY";
+        String context = "XUPROGMODE";
         try {
             user.login(connection, access_code, verify_code, context);
         } catch (VistaException ex) {
@@ -72,14 +72,13 @@ public class InvokeVprRpcITest {
      * VDL Documentation: http://www.va.gov/vdl/application.asp?appid=197
      */
     @Test
-    public void testVprRpcAllergyReturnsResults() {
+    public void testVprRpcVitalsReturnsResults() {
         RpcParameter dfn, id;
         try {
             dfn = new RpcParameter(RpcParameter.LITERAL, "2");
-            id = new RpcParameter(RpcParameter.LITERAL, VprDomain.ALLERGY.getId());
+            id = new RpcParameter(RpcParameter.LITERAL, VprDomain.VITAL.getId());
             String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
-//            System.out.println(result);
             Document document = null;
             try {
                 document = TestUtils.getDom(result);
@@ -89,7 +88,6 @@ public class InvokeVprRpcITest {
 //            System.out.println(TestUtils.getPrettyPrintDocument(document));
             NodeList resultsNodes = document.getElementsByTagName("results");
             assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
-            Node resultNode = resultsNodes.item(0);
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
@@ -108,13 +106,13 @@ public class InvokeVprRpcITest {
                 id = new RpcParameter(RpcParameter.LITERAL, domain.getId());
                 String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
                 String result = connection.exec(preparedRpc);
-                System.out.println(result.length());
-                System.out.println(result.substring(0, Math.min(60, result.length())));
                 try {
-                    TestUtils.getDom(result);
+                    Document document = TestUtils.getDom(result);
+                    result = TestUtils.getPrettyPrintDocument(document);
                 } catch (SAXException ex) {
                     System.out.println("XML could not be parsed:" + result);
                 }
+                System.out.println(result.substring(0, Math.min(1500, result.length())));
             } catch (VistaException ex) {
                 logger.error(null, ex);
             }
