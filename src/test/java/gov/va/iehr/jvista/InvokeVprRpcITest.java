@@ -119,6 +119,31 @@ public class InvokeVprRpcITest {
         }
     }
 
+    
+    @Test
+    public void testVprRpcLabReturnsResults() {
+        RpcParameter dfn, id;
+        try {
+            dfn = new RpcParameter(RpcParameter.LITERAL, "2");
+            id = new RpcParameter(RpcParameter.LITERAL, VprDomain.LAB.getId());
+            String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
+            String result = connection.exec(preparedRpc);
+            Document document = null;
+            try {
+                document = TestUtils.getDom(result);
+            } catch (SAXException ex) {
+                fail("XML could not be parsed:" + result);
+            }
+            //System.out.println(TestUtils.getPrettyPrintDocument(document));
+            NodeList resultsNodes = document.getElementsByTagName("results");
+            assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+    }
+
+    
+    
     @Test
     public void testVprDataVersionIsNumber() {
         String versionRegEx = "\\d\\.\\d+";
