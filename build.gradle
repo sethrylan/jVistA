@@ -3,6 +3,10 @@ apply plugin: 'java'
 group = 'gov.va.iehr'
 version = '0.1'
 
+project.ext {
+    javasimonVersion = '3.3.0'
+}
+
 sourceCompatibility = '1.7'
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
@@ -15,7 +19,8 @@ dependencies {
             'org.slf4j:slf4j-simple:1.7.1',
             'commons-configuration:commons-configuration:1.6',
             'org.apache.commons:commons-lang3:3.1'
-    testCompile 'junit:junit:4.10'
+    testCompile 'junit:junit:4.10',
+            'org.javasimon:javasimon-core:' + project.ext.javasimonVersion
 }
 
 tasks.withType(Test) {
@@ -23,7 +28,7 @@ tasks.withType(Test) {
     
     // listen to events in the test execution lifecycle
     beforeTest { descriptor ->
-        logger.lifecycle("\t" + descriptor)
+        logger.lifecycle(":" + descriptor)
     }
     // listen to standard out and standard error of the test JVM(s)
 //    onOutput { descriptor, event ->

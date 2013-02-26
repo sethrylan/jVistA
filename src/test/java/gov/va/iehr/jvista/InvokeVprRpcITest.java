@@ -7,8 +7,12 @@ import com.vistacowboy.jVista.VistaRpc;
 import com.vistacowboy.jVista.VistaUser;
 import gov.va.common.TestUtils;
 import gov.va.common.VistAResource;
+import java.util.Collection;
 import java.util.regex.Pattern;
 import static junit.framework.Assert.*;
+import org.javasimon.SimonManager;
+import org.javasimon.Split;
+import org.javasimon.Stopwatch;
 import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,13 +28,17 @@ public class InvokeVprRpcITest {
 
     private Logger logger = LoggerFactory.getLogger(InvokeRpcITest.class);
     VistaConnection connection = null;
+    private static final long NANOSECONDS_PER_SECOND = 1000000000l;
 
+
+    
     @BeforeClass
     public static void setUpClass() throws Exception {
     }
 
     @AfterClass
     public static void tearDownClass() throws Exception {
+        printStatistics();
     }
 
     @Before
@@ -44,7 +52,7 @@ public class InvokeVprRpcITest {
         VistaUser user = new VistaUser();
         String access_code = VistAResource.getAccessCode();
         String verify_code = VistAResource.getVerifyCode();
-        String context = "XUPROGMODE";
+        String context = "VPR APPLICATION PROXY";
         try {
             user.login(connection, access_code, verify_code, context);
         } catch (VistaException ex) {
@@ -121,27 +129,28 @@ public class InvokeVprRpcITest {
 
     
     @Test
+    @Ignore
     public void testVprRpcLabReturnsResults() {
         RpcParameter dfn, id;
         try {
-            dfn = new RpcParameter(RpcParameter.LITERAL, "2");
-            id = new RpcParameter(RpcParameter.LITERAL, VprDomain.LAB.getId());
+            dfn = new RpcParameter(RpcParameter.LITERAL, "3");
+            id = new RpcParameter(RpcParameter.LITERAL, VprDomain.ORDER.getId());
             String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
+//            System.out.println(result);
             Document document = null;
             try {
                 document = TestUtils.getDom(result);
             } catch (SAXException ex) {
                 fail("XML could not be parsed:" + result);
             }
-            //System.out.println(TestUtils.getPrettyPrintDocument(document));
+            System.out.println(TestUtils.getPrettyPrintDocument(document));
             NodeList resultsNodes = document.getElementsByTagName("results");
-            assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
+//            assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
     }
-
     
     
     @Test
@@ -155,6 +164,25 @@ public class InvokeVprRpcITest {
             logger.error(null, ex);
         }
     }
+    
+    private static void printStatistics() {        
+        Collection<String> simonNames = SimonManager.getSimonNames();
+        for (String string : simonNames) {
+            if (string.length() > 0) {
+                Stopwatch stopwatch = SimonManager.getStopwatch(string);
+                if (stopwatch.getCounter() != 0L) {
+//                    logger.info("JavaSimon Result: {}", stopwatch);       // uncomment for a simple output
+                    System.out.println(stopwatch.getName());
+                    System.out.println("\tcount: " + stopwatch.getCounter());
+                    System.out.println("\tmax  : " + Double.valueOf(stopwatch.getMax())/NANOSECONDS_PER_SECOND);
+                    System.out.println("\tmin  : " + Double.valueOf(stopwatch.getMin())/NANOSECONDS_PER_SECOND);
+                    System.out.println("\tmu   : " + stopwatch.getMean()/NANOSECONDS_PER_SECOND);
+                    System.out.println("\tsigma: " + stopwatch.getStandardDeviation()/NANOSECONDS_PER_SECOND);
+                }
+            }
+        }
+    }
+
 
     
 
