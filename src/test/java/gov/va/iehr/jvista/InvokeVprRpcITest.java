@@ -4,10 +4,14 @@ import com.vistacowboy.jVista.RpcParameter;
 import com.vistacowboy.jVista.VistaConnection;
 import com.vistacowboy.jVista.VistaException;
 import com.vistacowboy.jVista.VistaRpc;
+import com.vistacowboy.jVista.VistaSelect;
 import com.vistacowboy.jVista.VistaUser;
 import gov.va.common.TestUtils;
 import gov.va.common.VistAResource;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 import static junit.framework.Assert.*;
 import org.javasimon.SimonManager;
@@ -28,9 +32,7 @@ public class InvokeVprRpcITest {
 
     private Logger logger = LoggerFactory.getLogger(InvokeRpcITest.class);
     VistaConnection connection = null;
-    private static final long NANOSECONDS_PER_SECOND = 1000000000l;
-
-
+    private static final long NANOSECONDS_PER_SECOND = 1000000000L;
     
     @BeforeClass
     public static void setUpClass() throws Exception {
@@ -52,7 +54,8 @@ public class InvokeVprRpcITest {
         VistaUser user = new VistaUser();
         String access_code = VistAResource.getAccessCode();
         String verify_code = VistAResource.getVerifyCode();
-        String context = "VPR APPLICATION PROXY";
+//        String context = "VPR APPLICATION PROXY";
+        String context = "VPR SYNCHRONIZATION CONTEXT";
         try {
             user.login(connection, access_code, verify_code, context);
         } catch (VistaException ex) {
@@ -70,7 +73,6 @@ public class InvokeVprRpcITest {
         connection = null;
     }
     
-    
     /**
      * Test of VPR GET PATIENT DATA RPC
      * VPR GET PATIENT DATA: http://livevista.caregraf.info/rambler#!8994-3141
@@ -83,7 +85,7 @@ public class InvokeVprRpcITest {
     public void testVprRpcVitalsReturnsResults() {
         RpcParameter dfn, id;
         try {
-            dfn = new RpcParameter(RpcParameter.LITERAL, "2");
+            dfn = new RpcParameter(RpcParameter.LITERAL, "3");
             id = new RpcParameter(RpcParameter.LITERAL, VprDomain.VITAL.getId());
             String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
@@ -100,6 +102,25 @@ public class InvokeVprRpcITest {
             logger.error(null, ex);
         }
     }
+    
+    
+    @Test
+    public void testVprRpcVitalsPerformance() {
+        for (int i = 0; i < 20; i++) {
+        RpcParameter dfn, id;
+        try {
+            Split split = SimonManager.getStopwatch("describe all vitals of patient 3".replaceAll(" ", "")).start();
+            dfn = new RpcParameter(RpcParameter.LITERAL, "3");
+            id = new RpcParameter(RpcParameter.LITERAL, VprDomain.VITAL.getId());
+            String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
+            String result = connection.exec(preparedRpc);
+            split.stop();
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+        }
+    }
+
 
     @Test
     @Ignore
@@ -137,7 +158,6 @@ public class InvokeVprRpcITest {
             id = new RpcParameter(RpcParameter.LITERAL, VprDomain.ORDER.getId());
             String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
-//            System.out.println(result);
             Document document = null;
             try {
                 document = TestUtils.getDom(result);
@@ -145,13 +165,47 @@ public class InvokeVprRpcITest {
                 fail("XML could not be parsed:" + result);
             }
             System.out.println(TestUtils.getPrettyPrintDocument(document));
-            NodeList resultsNodes = document.getElementsByTagName("results");
-//            assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
     }
     
+    @Test
+    @Ignore
+    public void testVprRpcPatient() {
+        RpcParameter dfn, id;
+        try {
+            dfn = new RpcParameter(RpcParameter.LITERAL, "3");
+            id = new RpcParameter(RpcParameter.LITERAL, "patient");
+            String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
+            String result = connection.exec(preparedRpc);
+            System.out.println("vprpatient = " + result);
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+    }
+
+    
+    @Test
+    @Ignore
+    public void testVprJsonRpc() {
+        RpcParameter param;
+        try {            
+            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+//            params.put("\"patientId\"", "2");
+//            params.put("\"domain\"", "patient");
+            params.put("\"lastUpdate\"", "foo1");
+
+            param = new RpcParameter(RpcParameter.LIST,  params);
+            String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA JSON", new RpcParameter[]{param});
+            String result = connection.exec(preparedRpc);
+            System.out.println("results = " + result);
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+    }
+
+
     
     @Test
     public void testVprDataVersionIsNumber() {
@@ -159,12 +213,48 @@ public class InvokeVprRpcITest {
         try {
             String preparedRpc = VistaRpc.prepare("VPR DATA VERSION", null);
             String result = connection.exec(preparedRpc);
+//            System.out.println("result = " + result);
             Assert.assertTrue(result + " does not match " + versionRegEx, Pattern.matches(versionRegEx, result));
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
     }
     
+    
+    @Test
+    @Ignore
+    public void exportPatientDemographicsAsJson() {
+        VistaSelect select = new VistaSelect();
+        select.setFile("2");
+        String[][] result = null;
+        try {
+            result = select.find(connection);
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+
+        for(String[] arrDfn : result) {
+            String dfn = arrDfn[0];
+            RpcParameter param;
+            try {            
+                LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+                params.put("\"patientId\"", "2");
+                params.put("\"domain\"", "patient");
+                param = new RpcParameter(RpcParameter.LIST,  params);
+                String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA JSON", new RpcParameter[]{param});
+                String json = connection.exec(preparedRpc);
+                FileWriter fstream = new FileWriter("C:/patient_" + String.format("%04d", Integer.parseInt(dfn)) + ".json");
+                BufferedWriter out = new BufferedWriter(fstream);
+                out.write(json);
+                out.close();
+            } catch (VistaException ex) {
+                logger.error(null, ex);
+            } catch (Exception ex) {
+                logger.error(null, ex);
+            }
+        }
+    }
+        
     private static void printStatistics() {        
         Collection<String> simonNames = SimonManager.getSimonNames();
         for (String string : simonNames) {

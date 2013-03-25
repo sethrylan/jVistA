@@ -67,16 +67,41 @@ public class InvokeRpcITest {
     public void testSelectOnPatientFile() {
         VistaSelect select = new VistaSelect();
         select.setFile("2");
-        select.setFields(".01");
+//        select.setFields(".01");  // uncomment for patient full names
         String[][] result = null;
         try {
             result = select.find(connection);
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
-        //printMatrix(result);
+//        TestUtils.printMatrix(result);
         assertTrue("There should be over 100 patients.", result.length > 100);
     }
+    
+    @Test
+    public void testNhinPatientResults()  {
+        RpcParameter dfn, id;
+        try {
+            dfn = new RpcParameter(RpcParameter.LITERAL, "2");
+            id = new RpcParameter(RpcParameter.LITERAL, NhinDomain.PATIENT.getId());
+            String preparedRpc = VistaRpc.prepare("NHIN GET VISTA DATA", new RpcParameter[]{dfn,id});
+            String result = connection.exec(preparedRpc);
+            Document document = null;
+            try {
+                document = TestUtils.getDom(result);
+            } catch (SAXException ex) {
+                fail("XML could not be parsed:" + result);
+            }
+            System.out.println(TestUtils.getPrettyPrintDocument(document));
+            NodeList resultsNodes = document.getElementsByTagName("results");
+            assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
+            Node resultNode = resultsNodes.item(0);
+            assertEquals("1", resultNode.getAttributes().getNamedItem("total").getNodeValue());
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+    }
+
 
     /**
      * Test NHIN GET VISTA DATA RPC (Pre-v1.0 of VPR package RPCs)

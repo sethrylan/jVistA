@@ -37,8 +37,15 @@ tasks.withType(Test) {
 
 }
 
+task integrationTest(type: Test) {
+    include "**/*ITest*"
+}
+
+build.dependsOn(integrationTest) 
+
 //http://www.gradle.org/docs/current/dsl/org.gradle.api.tasks.testing.Test.html
 test {    
+    exclude "**/*ITest*"
     minHeapSize = "128m"
     maxHeapSize = "512m"
     jvmArgs '-XX:MaxPermSize=256m'
