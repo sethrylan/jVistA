@@ -1,5 +1,9 @@
 package gov.va.iehr.jvista;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.vistacowboy.jVista.RpcParameter;
 import com.vistacowboy.jVista.VistaConnection;
 import com.vistacowboy.jVista.VistaException;
@@ -54,8 +58,8 @@ public class InvokeVprRpcITest {
         VistaUser user = new VistaUser();
         String access_code = VistAResource.getAccessCode();
         String verify_code = VistAResource.getVerifyCode();
-//        String context = "VPR APPLICATION PROXY";
-        String context = "VPR SYNCHRONIZATION CONTEXT";
+        String context = "VPR APPLICATION PROXY";
+//        String context = "VPR SYNCHRONIZATION CONTEXT";
         try {
             user.login(connection, access_code, verify_code, context);
         } catch (VistaException ex) {
@@ -82,10 +86,11 @@ public class InvokeVprRpcITest {
      * VDL Documentation: http://www.va.gov/vdl/application.asp?appid=197
      */
     @Test
+    @Ignore
     public void testVprRpcVitalsReturnsResults() {
         RpcParameter dfn, id;
         try {
-            dfn = new RpcParameter(RpcParameter.LITERAL, "3");
+            dfn = new RpcParameter(RpcParameter.LITERAL, "2");
             id = new RpcParameter(RpcParameter.LITERAL, VprDomain.VITAL.getId());
             String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
             String result = connection.exec(preparedRpc);
@@ -100,11 +105,12 @@ public class InvokeVprRpcITest {
             assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
         } catch (VistaException ex) {
             logger.error(null, ex);
-        }
+        } 
     }
     
     
     @Test
+    @Ignore
     public void testVprRpcVitalsPerformance() {
         for (int i = 0; i < 20; i++) {
         RpcParameter dfn, id;
@@ -192,15 +198,28 @@ public class InvokeVprRpcITest {
         RpcParameter param;
         try {            
             LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-//            params.put("\"patientId\"", "2");
-//            params.put("\"domain\"", "patient");
-            params.put("\"lastUpdate\"", "foo1");
+            params.put("\"patientId\"", "73");
+            params.put("\"domain\"", VprDomain.VITAL.getId());
 
             param = new RpcParameter(RpcParameter.LIST,  params);
             String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA JSON", new RpcParameter[]{param});
             String result = connection.exec(preparedRpc);
             System.out.println("results = " + result);
+            
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            JsonParser jp = new JsonParser();
+            JsonElement je = jp.parse(result);
+            String json = gson.toJson(je);
+
+            
+            FileWriter fstream = new FileWriter("C:/vitals_0073_updated.json");
+            BufferedWriter out = new BufferedWriter(fstream);
+            out.write(json);
+            out.close();
+
         } catch (VistaException ex) {
+            logger.error(null, ex);
+        } catch (Exception ex) {
             logger.error(null, ex);
         }
     }
@@ -221,9 +240,10 @@ public class InvokeVprRpcITest {
     }
     
     
+    
     @Test
     @Ignore
-    public void exportPatientDemographicsAsJson() {
+    public void exportData() {
         VistaSelect select = new VistaSelect();
         select.setFile("2");
         String[][] result = null;
@@ -233,27 +253,42 @@ public class InvokeVprRpcITest {
             logger.error(null, ex);
         }
 
-        for(String[] arrDfn : result) {
-            String dfn = arrDfn[0];
-            RpcParameter param;
-            try {            
-                LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-                params.put("\"patientId\"", "2");
-                params.put("\"domain\"", "patient");
-                param = new RpcParameter(RpcParameter.LIST,  params);
-                String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA JSON", new RpcParameter[]{param});
-                String json = connection.exec(preparedRpc);
-                FileWriter fstream = new FileWriter("C:/patient_" + String.format("%04d", Integer.parseInt(dfn)) + ".json");
-                BufferedWriter out = new BufferedWriter(fstream);
-                out.write(json);
-                out.close();
-            } catch (VistaException ex) {
-                logger.error(null, ex);
-            } catch (Exception ex) {
-                logger.error(null, ex);
+        for(VprDomain domain : VprDomain.values()) {
+            for(String[] arrDfn : result) {
+                String dfn = arrDfn[0];
+                RpcParameter param;
+                String json = null;
+                try {            
+                    LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
+                    params.put("\"patientId\"", dfn);
+                    params.put("\"domain\"", domain.getId());
+                    param = new RpcParameter(RpcParameter.LIST,  params);
+                    String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA JSON", new RpcParameter[]{param});
+                    json = connection.exec(preparedRpc);
+
+                    // pretty-ify json
+                    Gson gson = new GsonBuilder().setPrettyPrinting().create();
+                    JsonParser jp = new JsonParser();
+                    JsonElement je = jp.parse(json);
+                    json = gson.toJson(je);
+
+//                    FileWriter fstream = new FileWriter("C:/vpr_json/" + domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfn)) + ".json");
+//                    BufferedWriter out = new BufferedWriter(fstream);
+//                    out.write(json);
+//                    out.close();
+                } catch (VistaException ex) {
+                    logger.error("Error on dfn: " + dfn + "; domain: " + domain.name(), ex);
+                    logger.error("json = " + json);
+                } catch (Exception ex) {
+                    logger.error("Error on dfn: " + dfn + "; domain: " + domain.name(), ex);
+                    logger.error("json = " + json);
+                }
             }
+
         }
     }
+
+
         
     private static void printStatistics() {        
         Collection<String> simonNames = SimonManager.getSimonNames();

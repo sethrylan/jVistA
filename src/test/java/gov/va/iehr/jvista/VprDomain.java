@@ -26,6 +26,7 @@ public enum VprDomain {
     EDUCATION_TOPICS("educat"),
     INSURANCE_POLICES("insur"),
     PANEL("panel"),
+    PATIENT("patient"),
     MED("med"),             // also "pharm"
     OBSERVATION("observ"),
     ORDER("order"),

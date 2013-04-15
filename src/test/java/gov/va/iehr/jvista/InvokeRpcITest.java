@@ -67,15 +67,29 @@ public class InvokeRpcITest {
     public void testSelectOnPatientFile() {
         VistaSelect select = new VistaSelect();
         select.setFile("2");
-//        select.setFields(".01");  // uncomment for patient full names
+        select.setFields(".01");  // uncomment for patient full names
         String[][] result = null;
         try {
             result = select.find(connection);
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
-//        TestUtils.printMatrix(result);
+        TestUtils.printMatrix(result);
         assertTrue("There should be over 100 patients.", result.length > 100);
+    }
+    
+    
+    @Test
+    public void testSCCheckOnDuz1()  {
+        RpcParameter param;
+        try {
+            param = new RpcParameter(RpcParameter.LITERAL, "1");
+            String preparedRpc = VistaRpc.prepare("SC KEY CHECK", new RpcParameter[]{param});
+            String result = connection.exec(preparedRpc);
+            System.out.println("Result = " + result);
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
     }
     
     @Test
