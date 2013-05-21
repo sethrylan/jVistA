@@ -69,7 +69,6 @@ public class LoginITest {
         assertEquals(context, user.getContext());
         assertEquals("1", user.getDuz());
         assertNotNull(greeting);
-        assertTrue("greeting was " + greeting, greeting.contains("SA"));
     }
     
 }
