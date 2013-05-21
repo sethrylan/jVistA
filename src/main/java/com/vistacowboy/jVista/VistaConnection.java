@@ -9,6 +9,7 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.Arrays;
 
 /**
  * Created with IntelliJ IDEA.
@@ -100,6 +101,8 @@ public class VistaConnection
         // SECURITY error?
         if (buf[0] != 0)
         {
+            System.out.println(Arrays.toString(buf));
+            System.out.println(new String(buf));
             response = new String(buf, 1, buf[0]);
             throw new VistaException(String.format("VistA SECURITY error: %s", response));
         }
