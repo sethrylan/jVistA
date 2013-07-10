@@ -1,7 +1,22 @@
-apply plugin: 'java'
 
-project.ext {
-    javasimonVersion = '3.3.0'
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    apply from: file('gradle/buildscript.gradle'), to: buildscript
+}
+
+apply plugin: 'java'
+//apply from: file('gradle/convention.gradle')
+apply from: file('gradle/check.gradle')
+apply from: file('gradle/license.gradle')
+//apply from: file('gradle/release.gradle')
+
+ext {
+    versions = [
+            javasimon: '3.3.0',
+            slf4j: '1.7.1'
+    ]
 }
 
 [compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
@@ -11,13 +26,13 @@ repositories {
 }
 
 dependencies {
-    compile 'org.slf4j:slf4j-api:1.7.1',
-            'org.slf4j:slf4j-simple:1.7.1',
+    compile "org.slf4j:slf4j-api:$versions.slf4j",
+            "org.slf4j:slf4j-simple:$versions.slf4j",
             'commons-configuration:commons-configuration:1.6',
             'org.apache.commons:commons-lang3:3.1'
     testCompile 'junit:junit:4.10',
             'com.google.code.gson:gson:2.2.2',
-            'org.javasimon:javasimon-core:' + project.ext.javasimonVersion
+            "org.javasimon:javasimon-core:$versions.javasimon"
 }
 
 tasks.withType(Test) {
