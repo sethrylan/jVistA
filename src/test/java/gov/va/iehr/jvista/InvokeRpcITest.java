@@ -64,6 +64,7 @@ public class InvokeRpcITest {
     }
 
     @Test
+    @Ignore
     public void testSelectOnPatientFile() {
         VistaSelect select = new VistaSelect();
         select.setFile("2");
@@ -86,14 +87,15 @@ public class InvokeRpcITest {
             param = new RpcParameter(RpcParameter.LITERAL, "SC PCMM SETUP");
             String preparedRpc = VistaRpc.prepare("SC KEY CHECK", new RpcParameter[]{param});
             String result = connection.exec(preparedRpc);
-            System.out.println("preparedRpc = " + preparedRpc);
-            System.out.println("result = " + result);
+            //System.out.println("preparedRpc = " + preparedRpc);
+            //System.out.println("result = " + result);
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
     }
     
     @Test
+    @Ignore
     public void testNhinPatientResults()  {
         RpcParameter dfn, id;
         try {
