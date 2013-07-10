@@ -9,6 +9,6 @@ repositories {
 dependencies {
     classpath 'nl.javadude.gradle.plugins:license-gradle-plugin:0.6.1'
     classpath 'com.github.townsfolk:gradle-release:1.2'
-    classpath 'org.ajoberstar:gradle-git:0.5.0'
+    classpath 'org.ajoberstar:gradle-git:0.6.0'
     classpath 'com.github.townsfolk:gradle-release:1.2'
 }
