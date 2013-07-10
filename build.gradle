@@ -1,3 +1,10 @@
+ext {
+    githubProjectName = 'jVistA'
+    versions = [
+            javasimon: '3.3.0',
+            slf4j: '1.7.1'
+    ]
+}
 
 buildscript {
     repositories {
@@ -6,20 +13,9 @@ buildscript {
     apply from: file('gradle/buildscript.gradle'), to: buildscript
 }
 
-apply plugin: 'java'
-//apply from: file('gradle/convention.gradle')
+apply from: file('gradle/convention.gradle')
 apply from: file('gradle/check.gradle')
 apply from: file('gradle/license.gradle')
-
-project.sourceCompatibility = '1.6'
-ext {
-    versions = [
-            javasimon: '3.3.0',
-            slf4j: '1.7.1'
-    ]
-}
-
-[compileJava, compileTestJava]*.options*.encoding = 'UTF-8'
 
 repositories {
     mavenCentral()

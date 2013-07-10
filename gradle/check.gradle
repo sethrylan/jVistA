@@ -1,9 +1,11 @@
 allprojects {
     // Checkstyle
     // adapted from https://gist.github.com/skhatri/1896321
+    // Configuraiton docs at http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.quality.CheckstyleExtension.html
     apply plugin: 'checkstyle'
 
     checkstyle {
+        showViolations = false
         ignoreFailures = true
     }
 
@@ -80,7 +82,7 @@ allprojects {
     // Configuration docs at http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.quality.PmdExtension.html
     apply plugin: 'pmd'
     tasks.withType(Pmd) {
-        reports.html.enabled true
-        ignoreFailures true
+        reports.html.enabled = true
+        ignoreFailures = true
     }
 }
