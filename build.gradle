@@ -10,8 +10,8 @@ apply plugin: 'java'
 //apply from: file('gradle/convention.gradle')
 apply from: file('gradle/check.gradle')
 apply from: file('gradle/license.gradle')
-//apply from: file('gradle/release.gradle')
 
+project.sourceCompatibility = '1.6'
 ext {
     versions = [
             javasimon: '3.3.0',

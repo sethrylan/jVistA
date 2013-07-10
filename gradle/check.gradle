@@ -53,7 +53,7 @@ allprojects {
     }
 
     // FindBugs
-    // see docs at http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.quality.FindBugsExtension.html
+    // Configuration docs at http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.quality.FindBugsExtension.html
     // and http://www.gradle.org/docs/current/userguide/findbugs_plugin.html
     apply plugin: 'findbugs'
     findbugs {
@@ -77,14 +77,10 @@ allprojects {
     }
 
     // PMD
-    //apply plugin: 'pmd'
-    //tasks.withType(Pmd) { reports.html.enabled true }
-
-    //apply plugin: 'cobertura'
-    //cobertura {
-    //    sourceDirs = sourceSets.main.java.srcDirs
-    //    format = 'html'
-    //    includes = ['**/*.java', '**/*.groovy']
-    //    excludes = []
-    //}
+    // Configuration docs at http://www.gradle.org/docs/current/dsl/org.gradle.api.plugins.quality.PmdExtension.html
+    apply plugin: 'pmd'
+    tasks.withType(Pmd) {
+        reports.html.enabled true
+        ignoreFailures true
+    }
 }
