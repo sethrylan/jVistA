@@ -45,6 +45,7 @@ tasks.withType(Test) {
 }
 
 task itest(type: Test) {
+    description = 'Runs integration tests (test classes ending in ITest).'
     include "**/*ITest*"
 }
 itest.dependsOn(cleanItest)
@@ -58,10 +59,12 @@ test {
 }
 
 task listCache << {
+    description = 'Prints all items in all Configurations (extends FileCollection), representing all artifacts and their dependencies.'
     configurations.compile.each { println it } 
 }
 
 task listJars << {
+    description = 'Prints the JAR files from all Configurations.'
     configurations.compile.each { File file -> println file.name }
 }
 
