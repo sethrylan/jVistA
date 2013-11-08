@@ -12,22 +12,30 @@ import com.vistacowboy.jVista.VistaSelect;
 import com.vistacowboy.jVista.VistaUser;
 import gov.va.common.TestUtils;
 import gov.va.common.VistAResource;
+import org.javasimon.SimonManager;
+import org.javasimon.Split;
+import org.javasimon.Stopwatch;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
+
 import java.io.BufferedWriter;
 import java.io.FileWriter;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
-import static junit.framework.Assert.*;
-import org.javasimon.SimonManager;
-import org.javasimon.Split;
-import org.javasimon.Stopwatch;
-import org.junit.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.fail;
 
 /**
  * @author gaineys
@@ -234,40 +242,6 @@ public class InvokeVprRpcITest {
 
     
     @Test
-    @Ignore
-    public void testVprJsonRpc() {
-        RpcParameter param;
-        try {            
-            LinkedHashMap<String, String> params = new LinkedHashMap<String, String>();
-            params.put("\"patientId\"", "2");
-            params.put("\"domain\"", VprDomain.PATIENT.getId());
-
-            param = new RpcParameter(RpcParameter.LIST,  params);
-            String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA JSON", new RpcParameter[]{param});
-            String result = connection.exec(preparedRpc);
-            System.out.println("results = " + result);
-            
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            JsonParser jp = new JsonParser();
-            JsonElement je = jp.parse(result);
-            String json = gson.toJson(je);
-
-            
-            FileWriter fstream = new FileWriter("C:/demographics_001_updated.json");
-            BufferedWriter out = new BufferedWriter(fstream);
-            out.write(json);
-            out.close();
-
-        } catch (VistaException ex) {
-            logger.error(null, ex);
-        } catch (Exception ex) {
-            logger.error(null, ex);
-        }
-    }
-
-
-    
-    @Test
     public void testVprDataVersionIsNumber() {
         String versionRegEx = "\\d\\.\\d+";
         try {
@@ -294,7 +268,7 @@ public class InvokeVprRpcITest {
             logger.error(null, ex);
         }
 
-        for(VprDomain domain : new VprDomain[]{VprDomain.PROBLEM}) {
+        for(VprDomain domain : VprDomain.values()) {
             for(String[] arrDfn : result) {
                 String dfn = arrDfn[0];
                 RpcParameter param;
@@ -313,7 +287,7 @@ public class InvokeVprRpcITest {
                     JsonElement je = jp.parse(json);
                     json = gson.toJson(je);
 
-                    FileWriter fstream = new FileWriter("C:/vpr12_json_20130507/" + domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfn)) + ".json");
+                    FileWriter fstream = new FileWriter("/Users/gaineys/vpr13_json_20131107/" + domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfn)) + ".json");
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(json);
                     out.close();

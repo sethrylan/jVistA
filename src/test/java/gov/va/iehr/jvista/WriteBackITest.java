@@ -1,9 +1,5 @@
 package gov.va.iehr.jvista;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.vistacowboy.jVista.RpcParameter;
 import com.vistacowboy.jVista.VistaConnection;
 import com.vistacowboy.jVista.VistaException;
@@ -12,22 +8,22 @@ import com.vistacowboy.jVista.VistaSelect;
 import com.vistacowboy.jVista.VistaUser;
 import gov.va.common.TestUtils;
 import gov.va.common.VistAResource;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
+import org.javasimon.SimonManager;
+import org.javasimon.Stopwatch;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
-import static junit.framework.Assert.*;
-import org.javasimon.SimonManager;
-import org.javasimon.Split;
-import org.javasimon.Stopwatch;
-import org.junit.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
-import org.xml.sax.SAXException;
+
+import static junit.framework.Assert.assertTrue;
 
 /**
  * @author gaineys
@@ -79,7 +75,7 @@ public class WriteBackITest {
     
     
     @Test
-//    @Ignore
+    @Ignore
     public void testSelectOnPatientFile() {
         VistaSelect select = new VistaSelect();
         select.setFile("2");
@@ -127,6 +123,7 @@ public class WriteBackITest {
 
         
     @Test
+    @Ignore
     public void testSCCheckOnDuz1()  {
         RpcParameter param;
         try {

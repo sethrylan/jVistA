@@ -8,15 +8,20 @@ import com.vistacowboy.jVista.VistaSelect;
 import com.vistacowboy.jVista.VistaUser;
 import gov.va.common.TestUtils;
 import gov.va.common.VistAResource;
-import gov.va.common.xml.XMLValidation;
-import static junit.framework.Assert.*;
-import org.junit.*;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import static junit.framework.Assert.*;
 
 /**
  * @author gaineys
@@ -81,6 +86,7 @@ public class InvokeRpcITest {
     
     
     @Test
+    @Ignore
     public void testSCCheckOnDuz1()  {
         RpcParameter param;
         try {
@@ -129,6 +135,7 @@ public class InvokeRpcITest {
      * VDL Documentation: http://www.va.gov/vdl/documents/Clinical/nationwide_health_info_net/nhin_tm.pdf
      */
     @Test
+    @Ignore
     public void testNhinVitalResultsAreWellFormed()  {
         RpcParameter dfn, id;
         try {
@@ -184,62 +191,6 @@ public class InvokeRpcITest {
                 logger.error(null, ex);
             }
         }
-    }
-    
-    
-    @Test
-	@Ignore
-    public void invokeWithoutLoginTest() {
-//        VistaUser user = new VistaUser();
-//        String access_code = VistAResource.getAccessCode();
-//        String verify_code = VistAResource.getVerifyCode();
-//        String context = "OR CPRS GUI CHART";
-//        String greeting = null;
-//        try {
-//            greeting = user.login(connection, access_code, verify_code, context);
-//        } catch (VistaException ex) {
-//            logger.error(null, ex);
-//        }
-        
-        VistaConnection conn = new VistaConnection(VistAResource.getAddress(), VistAResource.getPort());
-        try {
-            conn.connect();
-        } catch (VistaException ex) {
-            logger.error(null, ex);
-        }
-        
-        try {
-            RpcParameter dfn = new RpcParameter(RpcParameter.LITERAL, "DUZ");
-            RpcParameter id = new RpcParameter(RpcParameter.LITERAL, NhinDomain.VITAL.getId());
-            String preparedRpc = VistaRpc.prepare("XWB GET VARIABLE VALUE", new RpcParameter[]{dfn});
-
-//            String preparedRpc = VistaRpc.prepare("NHIN GET VISTA DATA", new RpcParameter[]{dfn,id});
-            String result = conn.exec(preparedRpc);
-            System.out.println("preparedRpc = " + preparedRpc);
-            System.out.println("result = " + result);
-//            Document document = null;
-//            try {
-//                document = TestUtils.getDom(result);
-//            } catch (SAXException ex) {
-//                fail("XML could not be parsed:" + result);
-//            }
-//            //System.out.println(TestUtils.getPrettyPrintDocument(document));
-//            NodeList resultsNodes = document.getElementsByTagName("results");
-//            assertEquals("There should be only one results node.", 1, resultsNodes.getLength());
-//            Node resultNode = resultsNodes.item(0);
-//            assertEquals("1", resultNode.getAttributes().getNamedItem("total").getNodeValue());
-        } catch (VistaException ex) {
-            ex.printStackTrace();
-            logger.error(null, ex);
-        }
-
-
-//        assertEquals(access_code, user.getAccess_code());
-//        assertEquals(verify_code, user.getVerify_code());
-//        assertEquals(context, user.getContext());
-//        assertEquals("1", user.getDuz());
-//        assertNotNull(greeting);
-//        assertTrue("greeting was " + greeting, greeting.contains("SA"));
     }
 
 }
