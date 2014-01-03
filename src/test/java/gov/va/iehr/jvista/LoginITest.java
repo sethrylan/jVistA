@@ -4,7 +4,6 @@ import com.vistacowboy.jVista.VistaConnection;
 import com.vistacowboy.jVista.VistaException;
 import com.vistacowboy.jVista.VistaUser;
 import gov.va.common.VistAResource;
-import static junit.framework.Assert.*;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -12,6 +11,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNotNull;
 
 
 /**
@@ -67,7 +69,7 @@ public class LoginITest {
         assertEquals(access_code, user.getAccess_code());
         assertEquals(verify_code, user.getVerify_code());
         assertEquals(context, user.getContext());
-        assertEquals("1", user.getDuz());
+        //assertEquals("1", user.getDuz());
         assertNotNull(greeting);
     }
     

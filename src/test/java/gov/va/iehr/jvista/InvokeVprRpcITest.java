@@ -29,8 +29,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 
@@ -94,7 +98,7 @@ public class InvokeVprRpcITest {
      * VDL Documentation: http://www.va.gov/vdl/application.asp?appid=197
      */
     @Test
-    @Ignore
+//    @Ignore
     public void testVprRpcVitalsReturnsResults() {
         RpcParameter dfn, id;
         try {
@@ -253,12 +257,11 @@ public class InvokeVprRpcITest {
             logger.error(null, ex);
         }
     }
-    
-    
-    
+
+
     @Test
     @Ignore
-    public void exportData() {
+    public void exportVprXml() {
         VistaSelect select = new VistaSelect();
         select.setFile("2");
         String[][] result = null;
@@ -267,6 +270,63 @@ public class InvokeVprRpcITest {
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
+
+        DateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmm");
+        String directory = System.getProperty("user.home") + "/vprxml_" + format.format(new Date());
+        Boolean useUserDirectory = new File(directory).mkdirs();
+
+        for(VprDomain domain : VprDomain.values()) {
+            for(String[] arrDfn : result) {
+                String dfnString = arrDfn[0];
+                RpcParameter dfn, id;
+                String xml = null;
+                try {
+                    dfn = new RpcParameter(RpcParameter.LITERAL, dfnString);
+                    id = new RpcParameter(RpcParameter.LITERAL, domain.getId());
+                    String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
+                    xml = connection.exec(preparedRpc);
+
+                    try {
+                        Document document = TestUtils.getDom(xml);
+                        xml = TestUtils.getPrettyPrintDocument(document);
+                    } catch (SAXException ex) {
+                        System.out.println("XML could not be parsed:" + result);
+                    }
+
+                    String basename = domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfnString));
+                    String filename = directory + File.separator + basename + ".xml";
+                    if (!useUserDirectory) {
+                        filename = File.createTempFile(basename, "xml").getName();
+                    }
+                    FileWriter fstream = new FileWriter(new File(filename));
+                    BufferedWriter out = new BufferedWriter(fstream);
+                    out.write(xml);
+                    out.close();
+                } catch (Exception ex) {
+                    logger.error("Error on dfn: " + dfnString + "; domain: " + domain.name(), ex);
+                    logger.error("xml = " + xml);
+                }
+            }
+
+        }
+    }
+
+
+    @Test
+    @Ignore
+    public void exportVprJson() {
+        VistaSelect select = new VistaSelect();
+        select.setFile("2");
+        String[][] result = null;
+        try {
+            result = select.find(connection);
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+
+        DateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmm");
+        String directory = System.getProperty("user.home") + "/vprjson_" + format.format(new Date());
+        Boolean useUserDirectory = new File(directory).mkdirs();
 
         for(VprDomain domain : VprDomain.values()) {
             for(String[] arrDfn : result) {
@@ -287,7 +347,12 @@ public class InvokeVprRpcITest {
                     JsonElement je = jp.parse(json);
                     json = gson.toJson(je);
 
-                    FileWriter fstream = new FileWriter("/Users/gaineys/vpr13_json_20131107/" + domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfn)) + ".json");
+                    String basename = domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfn));
+                    String filename = directory + File.separator + basename + ".json";
+                    if (!useUserDirectory) {
+                        filename = File.createTempFile(basename, "json").getName();
+                    }
+                    FileWriter fstream = new FileWriter(new File(filename));
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(json);
                     out.close();
