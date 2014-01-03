@@ -29,8 +29,12 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collection;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.regex.Pattern;
 
@@ -257,7 +261,7 @@ public class InvokeVprRpcITest {
 
     @Test
     @Ignore
-    public void exportDataXml() {
+    public void exportVprXml() {
         VistaSelect select = new VistaSelect();
         select.setFile("2");
         String[][] result = null;
@@ -266,6 +270,10 @@ public class InvokeVprRpcITest {
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
+
+        DateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmm");
+        String directory = System.getProperty("user.home") + "/vprxml_" + format.format(new Date());
+        Boolean useUserDirectory = new File(directory).mkdirs();
 
         for(VprDomain domain : VprDomain.values()) {
             for(String[] arrDfn : result) {
@@ -285,7 +293,12 @@ public class InvokeVprRpcITest {
                         System.out.println("XML could not be parsed:" + result);
                     }
 
-                    FileWriter fstream = new FileWriter("/Users/gaineys/vpr13_json_panorama/" + domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfnString)) + ".xml");
+                    String basename = domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfnString));
+                    String filename = directory + File.separator + basename + ".xml";
+                    if (!useUserDirectory) {
+                        filename = File.createTempFile(basename, "xml").getName();
+                    }
+                    FileWriter fstream = new FileWriter(new File(filename));
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(xml);
                     out.close();
@@ -301,7 +314,7 @@ public class InvokeVprRpcITest {
 
     @Test
     @Ignore
-    public void exportData() {
+    public void exportVprJson() {
         VistaSelect select = new VistaSelect();
         select.setFile("2");
         String[][] result = null;
@@ -310,6 +323,10 @@ public class InvokeVprRpcITest {
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
+
+        DateFormat format = new SimpleDateFormat("yyyyMMdd'T'HHmm");
+        String directory = System.getProperty("user.home") + "/vprjson_" + format.format(new Date());
+        Boolean useUserDirectory = new File(directory).mkdirs();
 
         for(VprDomain domain : VprDomain.values()) {
             for(String[] arrDfn : result) {
@@ -330,7 +347,12 @@ public class InvokeVprRpcITest {
                     JsonElement je = jp.parse(json);
                     json = gson.toJson(je);
 
-                    FileWriter fstream = new FileWriter("/Users/gaineys/vpr13_json_panorama_20131206/" + domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfn)) + ".json");
+                    String basename = domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfn));
+                    String filename = directory + File.separator + basename + ".json";
+                    if (!useUserDirectory) {
+                        filename = File.createTempFile(basename, "json").getName();
+                    }
+                    FileWriter fstream = new FileWriter(new File(filename));
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(json);
                     out.close();
