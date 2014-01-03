@@ -101,6 +101,7 @@ public class InvokeRpcITest {
     }
     
     @Test
+    @Ignore
     public void testNhinPatientResults()  {
         RpcParameter dfn, id;
         try {

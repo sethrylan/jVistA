@@ -94,7 +94,7 @@ public class InvokeVprRpcITest {
      * VDL Documentation: http://www.va.gov/vdl/application.asp?appid=197
      */
     @Test
-    @Ignore
+//    @Ignore
     public void testVprRpcVitalsReturnsResults() {
         RpcParameter dfn, id;
         try {
@@ -253,9 +253,52 @@ public class InvokeVprRpcITest {
             logger.error(null, ex);
         }
     }
-    
-    
-    
+
+
+    @Test
+    @Ignore
+    public void exportDataXml() {
+        VistaSelect select = new VistaSelect();
+        select.setFile("2");
+        String[][] result = null;
+        try {
+            result = select.find(connection);
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+
+        for(VprDomain domain : VprDomain.values()) {
+            for(String[] arrDfn : result) {
+                String dfnString = arrDfn[0];
+                RpcParameter dfn, id;
+                String xml = null;
+                try {
+                    dfn = new RpcParameter(RpcParameter.LITERAL, dfnString);
+                    id = new RpcParameter(RpcParameter.LITERAL, domain.getId());
+                    String preparedRpc = VistaRpc.prepare("VPR GET PATIENT DATA", new RpcParameter[]{dfn,id});
+                    xml = connection.exec(preparedRpc);
+
+                    try {
+                        Document document = TestUtils.getDom(xml);
+                        xml = TestUtils.getPrettyPrintDocument(document);
+                    } catch (SAXException ex) {
+                        System.out.println("XML could not be parsed:" + result);
+                    }
+
+                    FileWriter fstream = new FileWriter("/Users/gaineys/vpr13_json_panorama/" + domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfnString)) + ".xml");
+                    BufferedWriter out = new BufferedWriter(fstream);
+                    out.write(xml);
+                    out.close();
+                } catch (Exception ex) {
+                    logger.error("Error on dfn: " + dfnString + "; domain: " + domain.name(), ex);
+                    logger.error("xml = " + xml);
+                }
+            }
+
+        }
+    }
+
+
     @Test
     @Ignore
     public void exportData() {
@@ -287,7 +330,7 @@ public class InvokeVprRpcITest {
                     JsonElement je = jp.parse(json);
                     json = gson.toJson(je);
 
-                    FileWriter fstream = new FileWriter("/Users/gaineys/vpr13_json_20131107/" + domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfn)) + ".json");
+                    FileWriter fstream = new FileWriter("/Users/gaineys/vpr13_json_panorama_20131206/" + domain.name().toLowerCase() + "_" + String.format("%04d", Integer.parseInt(dfn)) + ".json");
                     BufferedWriter out = new BufferedWriter(fstream);
                     out.write(json);
                     out.close();
