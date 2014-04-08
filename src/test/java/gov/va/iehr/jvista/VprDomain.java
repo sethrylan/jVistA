@@ -10,40 +10,39 @@ package gov.va.iehr.jvista;
  * @author gaineys
  */
 public enum VprDomain {
-    
-    ACCESSION("accession"),
-    ALLERGY("allerg"),  // also "reaction"
-    APPOINTMENT("appointment"),
-    CLINICAL_PROCEDURE("clinicalProc"),
-    CONSULT("consult"),
-    DOCUMENT("document"),
-    FLAG("flag"),
-    HEALTH_FACTOR("factor"),
-    IMMUNIZATION("immunization"),
-    SKIN_TEST("skin"),
-    EXAM("exam"), //  14 I X?1"exam".E      S Y="VPRDPXAM",X="exams"
-    LAB("lab"),
-    EDUCATION_TOPICS("educat"),
-    INSURANCE_POLICES("insur"),
-    PANEL("panel"),
-    PATIENT("patient"),
-    MED("med"),             // also "pharm"
-    OBSERVATION("observ"),
-    ORDER("order"),
-    PROBLEM("problem"),
-    PROCEDURE("procedure"),
-    SURGERY("surg"),
-    VISIT("visit"),
+
+
     VITAL("vital"),
-    RADIOLOGY("rad"),      // also "xray"
-    NEW("new");    
+    PROBLEM("problem"),
+    ALLERGY("allergy"),
+    ORDER("order"),
+    TREATMENT("treatment"),
+    MED("med"),
+    CONSULT("consult"),
+    PROCEDURE("procedure"),
+    OBS("obs"),
+    LAB("lab"),
+    IMAGE("image"),
+    SURGERY("surgery"),
+    DOCUMENT("document"),
+    MH("mh"),
+    IMMUNIZATION("immunization"),
+    POV("pov"),
+    SKIN("skin"),
+    EXAM("exam"),
+    CPT("cpt"),
+    EDUCATION("education"),
+    FACTOR("factor"),
+    APPOINTMENT("appointment"),
+    VISIT("visit"),
+    PTF("ptf");
 
     private String id;
-    
+
     VprDomain(String id) {
         this.id = id;
     }
-    
+
     public String getId() {
         return this.id;
     }
