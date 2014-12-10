@@ -1,21 +1,11 @@
 package gov.va.iehr.jvista;
 
-import com.vistacowboy.jVista.RpcParameter;
-import com.vistacowboy.jVista.VistaConnection;
-import com.vistacowboy.jVista.VistaException;
-import com.vistacowboy.jVista.VistaRpc;
-import com.vistacowboy.jVista.VistaSelect;
-import com.vistacowboy.jVista.VistaUser;
+import com.vistacowboy.jVista.*;
 import gov.va.common.TestUtils;
 import gov.va.common.VistAResource;
 import org.javasimon.SimonManager;
 import org.javasimon.Stopwatch;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -222,7 +212,7 @@ public class WriteBackITest {
     @Test
     @Ignore
     public void testAllergiesWritebackCreate() {   
-        String dfn = "7";
+        String dfn = "850";
         listAllergies(dfn, connection);
         
         /*
@@ -255,25 +245,25 @@ public class WriteBackITest {
 //        String reactantFile = "PSDRUG(";                 // 50
 //        String reactantFile = "PSNDF(50.6,";             // 50.6
 //        String reactantFile = "PS("+allergy.getAllergyReactantFileNum()+",";   // 50.416 or 50.605
-        String gmrAgent = reactantName.trim() + "^" + reactantIen.trim()+ ";" + reactantFile;
+        String gmrAgent = "INDERAL^198;PSNDF(50.67,";
         
-        String allergyType = "D^Drug";
+        String allergyType = "O^OTHER";
 //        String allergyType = "DF^Drug,Food";
         
         String reactionNature = "A^Allergy";
 //        String reactionNature = "P^Pharmacological";
 //        String reactionNature = "U^Unknown";
 
-        String originatorIen = "1";
+        String originatorIen = "10000000224";
         
-        String originatingDatetime = "3130521.2006";
+        String originatingDatetime = "3140905.135415";
         
-        String[] symptoms = new String[]{"2^ITCHING,WATERING EYES^^^", "99^HYPOTENSION^^^", "66^DROWSINESS^^^"};
-
-        String observedOrHistorical = "h^HISTORICAL";
+        String[] symptoms = new String[]{"1^HIVES^^^", "133^RASH^^^", "2^ITCHING,WATERING EYES^^^"};
+        String[] chts = new String[]{"3140818.134015"};
+        String observedOrHistorical = "o^OBSERVED";
 //        String observedOrHistorical = "o^Observed";
         
-        String reactionDate = "3130521.2006";
+        String reactionDate = "3140708";
         RpcParameter dfnParam, patientAllergiesIenParam, listParam;
         try {
             patientAllergiesIenParam = new RpcParameter(RpcParameter.LITERAL, "");           // supposed to be the Patient Allergies IEN
@@ -286,10 +276,10 @@ public class WriteBackITest {
             paramMap.put("\"GMRAORIG\"", originatorIen);                        // IEN of originating NEW PERSON
             paramMap.put("\"GMRAORDT\"", originatingDatetime);                  // originating datetime in FM format
             paramMap.putAll(toListParameters("GMRASYMP", symptoms));            // list of symptoms
-//            params.put("\"GMRACHT\"", );                                      // not sure, but apparently a list of FM formatted dates
+            paramMap.putAll(toListParameters("GMRACHT", chts));                                      // not sure, but apparently a list of FM formatted dates
             paramMap.put("\"GMRAOBHX\"", observedOrHistorical);                 // whether the allergy is observed or historical
             paramMap.put("\"GMRARDT\"", reactionDate);                          // Reaction date in FM format
-//            params.put("\"GMRASEVR\"", );                                     // Optional; integer in range 1-3 inclusive 
+            paramMap.put("\"GMRASEVR\"", "2" );                                     // Optional; integer in range 1-3 inclusive 
 //            paramMap.putAll(arrayToListParameters("GMRACMTS", comments));     // list of comments
             
             listParam = new RpcParameter(RpcParameter.LIST,  paramMap);
