@@ -11,7 +11,8 @@ package gov.va.iehr.jvista;
  */
 public enum VprDomain {
 
-
+    ACCESSION("accession"),
+    PATIENT("patient"),
     VITAL("vital"),
     PROBLEM("problem"),
     ALLERGY("allergy"),
