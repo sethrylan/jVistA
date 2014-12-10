@@ -50,7 +50,7 @@ public class InvokeRpcITest {
         VistaUser user = new VistaUser();
         String access_code = VistAResource.getAccessCode();
         String verify_code = VistAResource.getVerifyCode();
-        String context = "NHIN APPLICATION PROXY";
+        String context = "VPR APPLICATION PROXY";
         try {
             user.login(connection, access_code, verify_code, context);
         } catch (VistaException ex) {
@@ -83,8 +83,25 @@ public class InvokeRpcITest {
         TestUtils.printMatrix(result);
         assertTrue("There should be over 100 patients.", result.length > 100);
     }
-    
-    
+
+
+    @Test
+    public void testHmpActivity() {
+        
+        RpcParameter param;
+        try {
+            param = new RpcParameter(RpcParameter.LITERAL, "");
+            String preparedRpc = VistaRpc.prepare("HMP PATIENT ACTIVITY", null);
+            String result = connection.exec(preparedRpc);
+            System.out.println("preparedRpc = " + preparedRpc);
+            System.out.println("result = " + result);
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+
+    }
+
+
     @Test
     @Ignore
     public void testSCCheckOnDuz1()  {
