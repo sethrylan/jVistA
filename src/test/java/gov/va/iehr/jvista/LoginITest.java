@@ -52,10 +52,22 @@ public class LoginITest {
         connection = null;
     }
 
-    
-    
+
+
     @Test
     public void userLoginTest() {
+
+
+        long l = System.currentTimeMillis();
+        connection = new VistaConnection(VistAResource.getAddress(), VistAResource.getPort());
+        try {
+            connection.connect();
+        } catch (VistaException ex) {
+            logger.error(null, ex);
+        }
+
+        System.out.println(System.currentTimeMillis() - l);
+
         VistaUser user = new VistaUser();
         String access_code = VistAResource.getAccessCode();
         String verify_code = VistAResource.getVerifyCode();
@@ -66,11 +78,17 @@ public class LoginITest {
         } catch (VistaException ex) {
             logger.error(null, ex);
         }
+
+        System.out.println(System.currentTimeMillis() - l);
+
         assertEquals(access_code, user.getAccess_code());
         assertEquals(verify_code, user.getVerify_code());
         assertEquals(context, user.getContext());
         //assertEquals("1", user.getDuz());
         assertNotNull(greeting);
+
+        System.out.println(System.currentTimeMillis() - l);
+
     }
-    
+
 }
